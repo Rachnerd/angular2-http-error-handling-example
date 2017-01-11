@@ -9,7 +9,7 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./error.component.css']
 })
 export class ErrorComponent implements OnInit, OnDestroy {
-    message: string;
+    error: HttpError;
     private subscriptions: Subscription;
 
     constructor(private userService: UserService) {
@@ -19,7 +19,7 @@ export class ErrorComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         const errorSubscription = this.userService.error$
             .subscribe(
-                (error: HttpError) => this.message = error.message
+                (error: HttpError) => this.error = error
             );
         this.subscriptions.add(errorSubscription);
     }

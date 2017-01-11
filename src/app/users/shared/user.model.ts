@@ -1,5 +1,3 @@
-import { Response } from '@angular/http';
-
 export class User {
     name: {
         title: string;
@@ -16,17 +14,11 @@ export class UsersResponse {
 }
 
 export abstract class HttpError {
-    message: string;
-
-    constructor(response: Response) {
-        this.message = response.text();
+    constructor(public message: string) {
     }
 }
 
-export class EmptyHttpError extends HttpError {
-    constructor() {
-        super({ text: () => '' } as Response);
-    }
+export class Empty {
 }
 
 export class FetchUsersError extends HttpError {

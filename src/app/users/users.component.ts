@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserService } from './shared/user.service';
-import { User, HttpError, EmptyHttpError, FetchUsersError } from './shared/user.model';
+import { User, HttpError, FetchUsersError, Empty } from './shared/user.model';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -50,7 +50,7 @@ export class UsersComponent implements OnInit, OnDestroy {
          */
         const clearErrorSubscription = this.userService.error$
             .skip(1)
-            .filter((error: HttpError) => error instanceof EmptyHttpError)
+            .filter((error: HttpError) => error instanceof Empty)
             .subscribe(
                 () => this.router.navigate(['users', 'list'])
             );
