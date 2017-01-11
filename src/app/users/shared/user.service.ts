@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
-import { User, HttpError, FetchUsersError, UsersResponse } from './user.model';
-import { Observable, Subject } from 'rxjs';
+import { User, HttpError, FetchUsersError, UsersResponse, EmptyHttpError } from './user.model';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class UserService {
-    users$: Observable<User>;
+    users$: Observable<Array<User>>;
     error$: Observable<HttpError>;
-    private usersSubject: Subject<User>;
-    private errorSubject: Subject<HttpError>;
+    private usersSubject: BehaviorSubject<Array<User>>;
+    private errorSubject: BehaviorSubject<HttpError>;
 
     constructor(private http: Http) {
-        this.usersSubject = new Subject<User>();
+        this.usersSubject = new BehaviorSubject<Array<User>>([]);
         this.users$ = this.usersSubject.asObservable();
-        this.errorSubject = new Subject<HttpError>();
+        this.errorSubject = new BehaviorSubject<HttpError>(new EmptyHttpError());
         this.error$ = this.errorSubject.asObservable();
     }
 
     fetchRandomUsers(): void {
-        this.http.get('http://randomuser.me/api')
+        this.http.get('http://randomuser.me/api?results=4')
             .map((res: Response) => res.json())
             .map((res: UsersResponse) => res.results)
             .subscribe(
@@ -37,5 +37,9 @@ export class UserService {
                 (users: Array<User>) => this.usersSubject.next(users),
                 (error: Response) => this.errorSubject.next(new FetchUsersError(error))
             );
+    }
+
+    clearError(): void {
+        this.errorSubject.next(new EmptyHttpError());
     }
 }
