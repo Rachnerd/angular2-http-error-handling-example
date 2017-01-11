@@ -37,6 +37,15 @@ export class UsersComponent implements OnInit, OnDestroy {
             );
 
         /**
+         * Subscribe to Http errors -> navigate to the error component
+         */
+        const fetchErrorSubscription = this.userService.error$
+            .filter((error: HttpError) => error instanceof FetchUsersError)
+            .subscribe(
+                () => console.error('Users fetch failed!')
+            );
+
+        /**
          * Subscribe to empty Http errors -> skip  -> navigate to the list component
          */
         const clearErrorSubscription = this.userService.error$
@@ -51,6 +60,7 @@ export class UsersComponent implements OnInit, OnDestroy {
          */
         this.subscriptions.add(userSubscription);
         this.subscriptions.add(errorSubscription);
+        this.subscriptions.add(fetchErrorSubscription);
         this.subscriptions.add(clearErrorSubscription);
     }
 
