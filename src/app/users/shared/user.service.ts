@@ -5,8 +5,14 @@ import { Observable, BehaviorSubject } from 'rxjs';
 
 @Injectable()
 export class UserService {
+    /**
+     * Exposed observable streams
+     */
     users$: Observable<Array<User>>;
     error$: Observable<HttpError>;
+    /**
+     * Private producers/observables
+     */
     private usersSubject: BehaviorSubject<Array<User>>;
     private errorSubject: BehaviorSubject<HttpError>;
 
@@ -28,7 +34,7 @@ export class UserService {
     }
 
     /**
-     * To demonstrate the error stream.
+     * Force a Http error.
      */
     forceRandomUsersError(): void {
         this.http.get('http://randomuser.me/typo')

@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserService } from './shared/user.service';
-import { User, HttpError, EmptyHttpError } from './shared/user.model';
+import { User, HttpError, EmptyHttpError, FetchUsersError } from './shared/user.model';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -19,17 +19,26 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
+        /**
+         * Subscribe to users -> navigate to the list component
+         */
         const userSubscription = this.userService.users$
             .subscribe(
                 (users: Array<User>) => this.router.navigate(['users', 'list'])
             );
 
+        /**
+         * Subscribe to Http errors -> navigate to the error component
+         */
         const errorSubscription = this.userService.error$
             .filter((error: HttpError) => error instanceof HttpError)
             .subscribe(
                 () => this.router.navigate(['users', 'error'])
             );
 
+        /**
+         * Subscribe to empty Http errors -> skip  -> navigate to the list component
+         */
         const clearErrorSubscription = this.userService.error$
             .skip(1)
             .filter((error: HttpError) => error instanceof EmptyHttpError)
@@ -37,13 +46,18 @@ export class UsersComponent implements OnInit, OnDestroy {
                 () => this.router.navigate(['users', 'list'])
             );
 
+        /**
+         * Combine all subscriptions
+         */
         this.subscriptions.add(userSubscription);
         this.subscriptions.add(errorSubscription);
         this.subscriptions.add(clearErrorSubscription);
     }
 
     ngOnDestroy(): void {
-        // Prevents memory leaks while routing.
+        /**
+         * Prevent memory leak by unsubscribing all hot streams.
+         */
         this.subscriptions.unsubscribe();
     }
 
