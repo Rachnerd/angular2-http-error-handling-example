@@ -37,7 +37,7 @@ export class UsersComponent implements OnInit, OnDestroy {
             );
 
         /**
-         * Subscribe to Http errors -> navigate to the error component
+         * Subscribe to fetch users error -> log a message
          */
         const fetchErrorSubscription = this.userService.error$
             .filter((error: HttpError) => error instanceof FetchUsersError)
