@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import { User, HttpError, FetchUsersError, UsersResponse, Empty } from './user.model';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 @Injectable()
 export class UserService {
@@ -13,13 +13,13 @@ export class UserService {
     /**
      * Private producers/observables
      */
-    private usersSubject: BehaviorSubject<Array<User>>;
-    private errorSubject: BehaviorSubject<HttpError | Empty>;
+    private usersSubject: ReplaySubject<Array<User>>;
+    private errorSubject: ReplaySubject<HttpError | Empty>;
 
     constructor(private http: Http) {
-        this.usersSubject = new BehaviorSubject<Array<User>>([]);
+        this.usersSubject = new ReplaySubject<Array<User>>(1);
         this.users$ = this.usersSubject.asObservable();
-        this.errorSubject = new BehaviorSubject<HttpError | Empty>(new Empty());
+        this.errorSubject = new ReplaySubject<HttpError | Empty>(1);
         this.error$ = this.errorSubject.asObservable();
     }
 

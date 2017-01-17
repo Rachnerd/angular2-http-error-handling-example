@@ -46,10 +46,9 @@ export class UsersComponent implements OnInit, OnDestroy {
             );
 
         /**
-         * Subscribe to empty Http errors -> skip  -> navigate to the list component
+         * Subscribe to empty Http errors -> navigate to the list component
          */
         const clearErrorSubscription = this.userService.error$
-            .skip(1)
             .filter((error: HttpError) => error instanceof Empty)
             .subscribe(
                 () => this.router.navigate(['users', 'list'])
