@@ -18,7 +18,7 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         /**
-         * Subscribe to users -> navigate to the list component
+         * Subscribe to users && subscribe to cleared errors -> navigate to the list component
          */
         const userSubscription = this.userService.users$
             .merge(
