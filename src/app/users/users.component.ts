@@ -21,6 +21,10 @@ export class UsersComponent implements OnInit, OnDestroy {
          * Subscribe to users -> navigate to the list component
          */
         const userSubscription = this.userService.users$
+            .merge(
+                this.userService.error$
+                    .filter((error: HttpError) => error instanceof Empty)
+            )
             .subscribe(
                 (users: Array<User>) => this.router.navigate(['users', 'list'])
             );
@@ -42,23 +46,12 @@ export class UsersComponent implements OnInit, OnDestroy {
             .subscribe(
                 () => console.error('Users fetch failed!')
             );
-
-        /**
-         * Subscribe to empty Http errors -> navigate to the list component
-         */
-        const clearErrorSubscription = this.userService.error$
-            .filter((error: HttpError) => error instanceof Empty)
-            .subscribe(
-                () => this.router.navigate(['users', 'list'])
-            );
-
         /**
          * Combine all subscriptions
          */
         this.subscriptions.add(userSubscription);
         this.subscriptions.add(errorSubscription);
         this.subscriptions.add(fetchErrorSubscription);
-        this.subscriptions.add(clearErrorSubscription);
     }
 
     ngOnDestroy(): void {
