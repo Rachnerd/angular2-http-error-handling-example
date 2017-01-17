@@ -10,11 +10,9 @@ import { Subscription } from 'rxjs';
     styleUrls: ['./users.component.css']
 })
 export class UsersComponent implements OnInit, OnDestroy {
-    users: Array<User>;
     private subscriptions: Subscription;
 
     constructor(private router: Router, private userService: UserService) {
-        this.users = [];
         this.subscriptions = new Subscription();
     }
 
