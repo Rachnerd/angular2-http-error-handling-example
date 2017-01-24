@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { UserService } from '../shared/user.service';
 import { User } from '../shared/user.model';
 import { Subscription } from 'rxjs';
+import { UserStateService } from '../shared/user-state.service';
 
 @Component({
     selector: 'eh-users-list',
@@ -12,12 +12,12 @@ export class UsersListComponent implements OnInit, OnDestroy {
     users: Array<User>;
     private subscriptions: Subscription;
 
-    constructor(private userService: UserService) {
+    constructor(private state: UserStateService) {
         this.subscriptions = new Subscription();
     }
 
     ngOnInit(): void {
-        const userSubscription = this.userService.users$
+        const userSubscription = this.state.users$
             .subscribe(
                 (users: Array<User>) => this.users = users
             );

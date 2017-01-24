@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { UserService } from '../shared/user.service';
-import { HttpError } from '../shared/user.model';
+import { HttpError, Empty } from '../shared/user.model';
 import { Subscription } from 'rxjs';
+import { UserStateService } from '../shared/user-state.service';
 
 @Component({
     selector: 'eh-error',
@@ -12,12 +12,12 @@ export class ErrorComponent implements OnInit, OnDestroy {
     error: HttpError;
     private subscriptions: Subscription;
 
-    constructor(private userService: UserService) {
+    constructor(private state: UserStateService) {
         this.subscriptions = new Subscription();
     }
 
     ngOnInit(): void {
-        const errorSubscription = this.userService.error$
+        const errorSubscription = this.state.error$
             .subscribe(
                 (error: HttpError) => this.error = error
             );
@@ -29,6 +29,6 @@ export class ErrorComponent implements OnInit, OnDestroy {
     }
 
     clearError(): void {
-        this.userService.clearError();
+        this.state.error = new Empty();
     }
 }

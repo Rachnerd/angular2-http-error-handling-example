@@ -1,57 +1,83 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserService } from './shared/user.service';
-import { User, HttpError, FetchUsersError, Empty } from './shared/user.model';
-import { Router } from '@angular/router';
+import { HttpError, Empty } from './shared/user.model';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { UserStateService } from './shared/user-state.service';
 
 @Component({
     selector: 'eh-users',
     templateUrl: './users.component.html',
-    styleUrls: ['./users.component.css']
+    styleUrls: ['./users.component.css'],
+    providers: [UserStateService]
 })
 export class UsersComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription;
 
-    constructor(private router: Router, private userService: UserService) {
+    constructor(private router: Router, private route: ActivatedRoute, private userService: UserService, private state: UserStateService) {
         this.subscriptions = new Subscription();
     }
 
-    ngOnInit(): void {
+    ngOnInit(): void  {
         /**
-         * Subscribe to users && subscribe to cleared errors -> navigate to the list component
+         * Update state with new values fetched from the server.
          */
-        const userSubscription = this.userService.users$
+        const usersSubscription = this.userService.users$
+            .subscribe(
+                users => this.state.users = users
+            );
+        const errorSubscription = this.userService.error$
+            .subscribe(
+                error => this.state.error = error
+            );
+        /**
+         * Subscribe to users and empty errors -> navigate to the list component
+         */
+        const showUsersSubscription = this.state
+            .users$
             .merge(
-                this.userService.error$
-                    .filter((error: HttpError) => error instanceof Empty)
+                this.state.error$
+                    .filter((error: Empty) => error instanceof Empty)
             )
             .subscribe(
-                (users: Array<User>) => this.router.navigate(['users', 'list'])
+                () => {
+                    this.router.navigate(['./list'], {
+                        relativeTo: this.route
+                    });
+                }
             );
 
         /**
          * Subscribe to Http errors -> navigate to the error component
          */
-        const errorSubscription = this.userService.error$
+        const showErrorSubscription = this.state
+            .error$
             .filter((error: HttpError) => error instanceof HttpError)
             .subscribe(
-                () => this.router.navigate(['users', 'error'])
+                error => {
+                    this.router.navigate(['./error'], {
+                        relativeTo: this.route
+                    });
+                }
             );
 
-        /**
-         * Subscribe to fetch users error -> log a message
-         */
-        const fetchErrorSubscription = this.userService.error$
-            .filter((error: HttpError) => error instanceof FetchUsersError)
-            .subscribe(
-                () => console.error('Users fetch failed!')
-            );
+        // Example specific error subscription.
+        // /**
+        //  * Subscribe to fetch users error -> log a message
+        //  */
+        // const fetchErrorSubscription = this.userService.error$
+        //     .filter((error: HttpError) => error instanceof FetchUsersError)
+        //     .subscribe(
+        //         () => console.error('Users fetch failed!')
+        //     );
+
         /**
          * Combine all subscriptions
          */
-        this.subscriptions.add(userSubscription);
+        this.subscriptions.add(usersSubscription);
         this.subscriptions.add(errorSubscription);
-        this.subscriptions.add(fetchErrorSubscription);
+        this.subscriptions.add(showUsersSubscription);
+        this.subscriptions.add(showErrorSubscription);
     }
 
     ngOnDestroy(): void {
