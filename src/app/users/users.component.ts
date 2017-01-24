@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { UserService } from './shared/user.service';
-import { HttpError, Empty } from './shared/user.model';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserStateService } from './shared/user-state.service';
@@ -49,19 +48,24 @@ export class UsersComponent implements OnInit, OnDestroy {
 
     private initStateUpdate() {
         /**
-         * Update state with new values fetched from the server.
+         * Update users state and stop loading
          */
         const usersSubscription = this.userService.users$
-            .do(() => this.stopLoading())
-            .subscribe(
-                users => this.state.users = users
+            .do(() =>
+                this.stopLoading()
+            )
+            .subscribe(users =>
+                this.state.users = users
             );
 
         const errorSubscription = this.userService.error$
-            .do(() => this.stopLoading())
-            .subscribe(
-                error => this.state.error = error
+            .do(() =>
+                this.stopLoading()
+            )
+            .subscribe(error =>
+                this.state.error = error
             );
+
         this.subscriptions.add(usersSubscription);
         this.subscriptions.add(errorSubscription);
     }
@@ -77,45 +81,27 @@ export class UsersComponent implements OnInit, OnDestroy {
          */
         const showListSubscription = this.state
             .users$
-            .merge(
-                this.state.error$
-                    .filter((error: Empty) => error instanceof Empty)
-            )
-            .subscribe(
-                () => {
-                    this.router.navigate(['./list'], {
-                        relativeTo: this.route
-                    });
-                }
+            .merge(this.state.clearError$)
+            .subscribe(() =>
+                this.router.navigate(['./list'], { relativeTo: this.route })
             );
 
         /**
          * Subscribe to Http errors -> navigate to the error component
          */
         const showErrorSubscription = this.state
-            .error$
-            .filter((error: HttpError) => error instanceof HttpError)
-            .subscribe(
-                error => {
-                    this.router.navigate(['./error'], {
-                        relativeTo: this.route
-                    });
-                }
+            .httpError$
+            .subscribe(error =>
+                this.router.navigate(['./error'], { relativeTo: this.route })
             );
         /**
          * Subscribe to isLoading that is true -> navigate to the loading component
          */
         const showLoadingSubscription = this.state
-            .isLoading$
-            .filter((isLoading: boolean) => isLoading === true)
-            .subscribe(
-                () => {
-                    this.router.navigate(['./loading'], {
-                        relativeTo: this.route
-                    });
-                }
+            .startLoading$
+            .subscribe(() =>
+                this.router.navigate(['./loading'], { relativeTo: this.route })
             );
-
         /**
          * Combine all subscriptions
          */

@@ -17,9 +17,11 @@ export class ErrorComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        const errorSubscription = this.state.error$
+        const errorSubscription = this.state.httpError$
             .subscribe(
-                (error: HttpError) => this.error = error
+                (error: HttpError) => {
+                    this.error = error
+                }
             );
         this.subscriptions.add(errorSubscription);
     }
