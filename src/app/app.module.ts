@@ -6,12 +6,10 @@ import { AppComponent } from './app.component';
 import { UsersModule } from './users/users.module';
 import { RouterModule } from '@angular/router';
 import { UserService } from './users/shared/user.service';
-import { TestComponent } from './test/test.component';
 
 @NgModule({
     declarations: [
-        AppComponent,
-        TestComponent
+        AppComponent
     ],
     imports: [
         BrowserModule,

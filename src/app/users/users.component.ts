@@ -14,26 +14,68 @@ import { UserStateService } from './shared/user-state.service';
 export class UsersComponent implements OnInit, OnDestroy {
     private subscriptions: Subscription;
 
-    constructor(private router: Router, private route: ActivatedRoute, private userService: UserService, private state: UserStateService) {
+    constructor(private router: Router,
+                private route: ActivatedRoute,
+                private userService: UserService,
+                private state: UserStateService) {
         this.subscriptions = new Subscription();
     }
 
-    ngOnInit(): void  {
+    ngOnInit(): void {
+        this.initStateUpdate();
+        this.initStateUpdateHandlers();
+    }
+
+    ngOnDestroy(): void {
+        /**
+         * Prevent memory leak by unsubscribing all hot streams.
+         */
+        this.subscriptions.unsubscribe();
+    }
+
+    fetch(): void {
+        this.state.isLoading = true;
+        setTimeout(() => {
+            this.userService.fetchRandomUsers();
+        }, 1000);
+    }
+
+    fetchError(): void {
+        this.state.isLoading = true;
+        setTimeout(() => {
+            this.userService.forceRandomUsersError();
+        }, 1000);
+    }
+
+    private initStateUpdate() {
         /**
          * Update state with new values fetched from the server.
          */
         const usersSubscription = this.userService.users$
+            .do(() => this.stopLoading())
             .subscribe(
                 users => this.state.users = users
             );
+
         const errorSubscription = this.userService.error$
+            .do(() => this.stopLoading())
             .subscribe(
                 error => this.state.error = error
             );
+        this.subscriptions.add(usersSubscription);
+        this.subscriptions.add(errorSubscription);
+    }
+
+    private stopLoading() {
+        this.state.isLoading = false;
+    }
+
+    private initStateUpdateHandlers() {
         /**
-         * Subscribe to users and empty errors -> navigate to the list component
+         * Subscribe to users -> navigate to the list component
+         * Subscribe to error instance of Empty -> navigate to the list component
          */
-        const showUsersSubscription = this.state
+        const showListSubscription = this.state
             .users$
             .merge(
                 this.state.error$
@@ -60,38 +102,25 @@ export class UsersComponent implements OnInit, OnDestroy {
                     });
                 }
             );
-
-        // Example specific error subscription.
-        // /**
-        //  * Subscribe to fetch users error -> log a message
-        //  */
-        // const fetchErrorSubscription = this.userService.error$
-        //     .filter((error: HttpError) => error instanceof FetchUsersError)
-        //     .subscribe(
-        //         () => console.error('Users fetch failed!')
-        //     );
+        /**
+         * Subscribe to isLoading that is true -> navigate to the loading component
+         */
+        const showLoadingSubscription = this.state
+            .isLoading$
+            .filter((isLoading: boolean) => isLoading === true)
+            .subscribe(
+                () => {
+                    this.router.navigate(['./loading'], {
+                        relativeTo: this.route
+                    });
+                }
+            );
 
         /**
          * Combine all subscriptions
          */
-        this.subscriptions.add(usersSubscription);
-        this.subscriptions.add(errorSubscription);
-        this.subscriptions.add(showUsersSubscription);
+        this.subscriptions.add(showListSubscription);
         this.subscriptions.add(showErrorSubscription);
-    }
-
-    ngOnDestroy(): void {
-        /**
-         * Prevent memory leak by unsubscribing all hot streams.
-         */
-        this.subscriptions.unsubscribe();
-    }
-
-    fetch(): void {
-        this.userService.fetchRandomUsers();
-    }
-
-    fetchError(): void {
-        this.userService.forceRandomUsersError();
+        this.subscriptions.add(showLoadingSubscription);
     }
 }

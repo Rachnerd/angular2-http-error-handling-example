@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { UsersListComponent } from './users-list/users-list.component';
 import { ErrorComponent } from './error/error.component';
 import { UserComponent } from './user/user.component';
+import { LoadingComponent } from './loading/loading.component';
 
 @NgModule({
     imports: [
@@ -22,6 +23,10 @@ import { UserComponent } from './user/user.component';
                     {
                         path: 'error',
                         component: ErrorComponent
+                    },
+                    {
+                        path: 'loading',
+                        component: LoadingComponent
                     }
                 ]
             }
@@ -31,7 +36,8 @@ import { UserComponent } from './user/user.component';
         UsersComponent,
         UsersListComponent,
         ErrorComponent,
-        UserComponent
+        UserComponent,
+        LoadingComponent
     ],
     providers: [UserService]
 })
