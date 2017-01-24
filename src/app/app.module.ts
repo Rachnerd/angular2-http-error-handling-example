@@ -5,10 +5,13 @@ import { HttpModule } from '@angular/http';
 import { AppComponent } from './app.component';
 import { UsersModule } from './users/users.module';
 import { RouterModule } from '@angular/router';
+import { UserService } from './users/shared/user.service';
+import { TestComponent } from './test/test.component';
 
 @NgModule({
     declarations: [
-        AppComponent
+        AppComponent,
+        TestComponent
     ],
     imports: [
         BrowserModule,
@@ -23,7 +26,7 @@ import { RouterModule } from '@angular/router';
         ]),
         UsersModule
     ],
-    providers: [],
+    providers: [UserService],
     bootstrap: [AppComponent]
 })
 export class AppModule {
