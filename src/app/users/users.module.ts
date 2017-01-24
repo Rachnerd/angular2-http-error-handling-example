@@ -7,6 +7,7 @@ import { UsersListComponent } from './users-list/users-list.component';
 import { ErrorComponent } from './error/error.component';
 import { UserComponent } from './user/user.component';
 import { LoadingComponent } from './loading/loading.component';
+import { CreateComponent } from './create/create.component';
 
 @NgModule({
     imports: [
@@ -37,7 +38,8 @@ import { LoadingComponent } from './loading/loading.component';
         UsersListComponent,
         ErrorComponent,
         UserComponent,
-        LoadingComponent
+        LoadingComponent,
+        CreateComponent
     ],
     providers: [UserService]
 })
