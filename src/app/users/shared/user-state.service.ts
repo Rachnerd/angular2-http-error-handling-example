@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { User, HttpError, Empty } from './user.model';
-import { Observable, ReplaySubject, Subject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 @Injectable()
 export class UserStateService {
