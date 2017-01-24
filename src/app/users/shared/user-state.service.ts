@@ -27,7 +27,7 @@ export class UserStateService {
             .filter((error: Empty) => error instanceof Empty) as Observable<Empty>;
 
         this.startLoading$ = this.isLoadingSubject
-            .filter((isLoading: boolean) => isLoading === true);
+            .filter((isLoading: boolean) => isLoading);
     }
 
     set users(users: Array<User>) {
@@ -40,5 +40,9 @@ export class UserStateService {
 
     set isLoading(isLoading: boolean) {
         this.isLoadingSubject.next(isLoading);
+    }
+
+    clearError() {
+        this.error = new Empty();
     }
 }
