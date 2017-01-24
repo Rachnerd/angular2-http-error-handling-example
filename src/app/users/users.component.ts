@@ -83,7 +83,7 @@ export class UsersComponent implements OnInit, OnDestroy {
             .users$
             .merge(this.state.clearError$)
             .subscribe(() =>
-                this.router.navigate(['./list'], { relativeTo: this.route })
+                this.router.navigate(['./list'], {relativeTo: this.route})
             );
 
         /**
@@ -92,7 +92,7 @@ export class UsersComponent implements OnInit, OnDestroy {
         const showErrorSubscription = this.state
             .httpError$
             .subscribe(error =>
-                this.router.navigate(['./error'], { relativeTo: this.route })
+                this.router.navigate(['./error'], {relativeTo: this.route})
             );
         /**
          * Subscribe to isLoading that is true -> navigate to the loading component
@@ -100,7 +100,7 @@ export class UsersComponent implements OnInit, OnDestroy {
         const showLoadingSubscription = this.state
             .startLoading$
             .subscribe(() =>
-                this.router.navigate(['./loading'], { relativeTo: this.route })
+                this.router.navigate(['./loading'], {relativeTo: this.route})
             );
         /**
          * Combine all subscriptions
