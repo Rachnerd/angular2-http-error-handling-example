@@ -7,6 +7,7 @@ export class User {
     picture: {
         medium: string;
     }
+    isCreated: boolean;
 }
 
 export class UsersResponse {
@@ -22,4 +23,7 @@ export class Empty {
 }
 
 export class FetchUsersError extends HttpError {
+}
+
+export class CreateUserError extends HttpError {
 }

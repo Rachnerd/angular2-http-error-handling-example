@@ -28,6 +28,10 @@ import { CreateComponent } from './create/create.component';
                     {
                         path: 'loading',
                         component: LoadingComponent
+                    },
+                    {
+                        path: 'create',
+                        component: CreateComponent
                     }
                 ]
             }

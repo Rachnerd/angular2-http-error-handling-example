@@ -3,6 +3,7 @@ import { UserService } from './shared/user.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserStateService } from './shared/user-state.service';
+import { User } from './shared/user.model';
 
 @Component({
     selector: 'eh-users',
@@ -51,30 +52,36 @@ export class UsersComponent implements OnInit, OnDestroy {
          * Update users state and stop loading
          */
         const usersSubscription = this.userService.users$
-            .do(() =>
-                this.stopLoading()
-            )
             .subscribe(users =>
                 this.state.users = users
             );
 
         const errorSubscription = this.userService.error$
-            .do(() =>
-                this.stopLoading()
-            )
             .subscribe(error =>
                 this.state.error = error
             );
 
+        const userSubscription = this.userService
+            .user$
+            .subscribe((user) =>
+                this.state.pushUser(user)
+            );
+
         this.subscriptions.add(usersSubscription);
+        this.subscriptions.add(userSubscription);
         this.subscriptions.add(errorSubscription);
     }
 
-    private stopLoading() {
-        this.state.isLoading = false;
-    }
-
     private initStateUpdateHandlers() {
+        /**
+         * Subscribe to isLoading that is true -> navigate to the loading component
+         */
+        const showLoadingSubscription = this.state
+            .startLoading$
+            .subscribe(() =>
+                this.router.navigate(['./loading'], {relativeTo: this.route})
+            );
+
         /**
          * Subscribe to users -> navigate to the list component
          * Subscribe to error instance of Empty -> navigate to the list component
@@ -82,6 +89,9 @@ export class UsersComponent implements OnInit, OnDestroy {
         const showListSubscription = this.state
             .users$
             .merge(this.state.clearError$)
+            .do(() =>
+                this.state.isLoading = false
+            )
             .subscribe(() =>
                 this.router.navigate(['./list'], {relativeTo: this.route})
             );
@@ -91,16 +101,23 @@ export class UsersComponent implements OnInit, OnDestroy {
          */
         const showErrorSubscription = this.state
             .httpError$
+            .do(() =>
+                this.state.isLoading = false
+            )
             .subscribe(error =>
                 this.router.navigate(['./error'], {relativeTo: this.route})
             );
+
         /**
-         * Subscribe to isLoading that is true -> navigate to the loading component
+         * Subscribe to new user -> generate a new user
          */
-        const showLoadingSubscription = this.state
-            .startLoading$
-            .subscribe(() =>
-                this.router.navigate(['./loading'], {relativeTo: this.route})
+        const rawUserSubscription = this.state
+            .rawUser$
+            .do(() =>
+                this.state.isLoading = false
+            )
+            .subscribe((user) =>
+                this.userService.generateUser()
             );
         /**
          * Combine all subscriptions
@@ -108,5 +125,6 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.subscriptions.add(showListSubscription);
         this.subscriptions.add(showErrorSubscription);
         this.subscriptions.add(showLoadingSubscription);
+        this.subscriptions.add(rawUserSubscription);
     }
 }
