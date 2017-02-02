@@ -3,7 +3,6 @@ import { UserService } from './shared/user.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserStateService } from './shared/user-state.service';
-import { User } from './shared/user.model';
 
 @Component({
     selector: 'eh-users',
@@ -51,12 +50,14 @@ export class UsersComponent implements OnInit, OnDestroy {
         /**
          * Update users state and stop loading
          */
-        const usersSubscription = this.userService.users$
+        const usersSubscription = this.userService
+            .users$
             .subscribe(users =>
                 this.state.users = users
             );
 
-        const errorSubscription = this.userService.error$
+        const errorSubscription = this.userService
+            .error$
             .subscribe(error =>
                 this.state.error = error
             );
@@ -88,10 +89,10 @@ export class UsersComponent implements OnInit, OnDestroy {
          */
         const showListSubscription = this.state
             .users$
-            .merge(this.state.clearError$)
             .do(() =>
                 this.state.isLoading = false
             )
+            .merge(this.state.clearError$)
             .subscribe(() =>
                 this.router.navigate(['./list'], {relativeTo: this.route})
             );
@@ -109,13 +110,10 @@ export class UsersComponent implements OnInit, OnDestroy {
             );
 
         /**
-         * Subscribe to new user -> generate a new user
+         * Subscribe to new (local) user -> generate a new user
          */
         const rawUserSubscription = this.state
             .rawUser$
-            .do(() =>
-                this.state.isLoading = false
-            )
             .subscribe((user) =>
                 this.userService.generateUser()
             );

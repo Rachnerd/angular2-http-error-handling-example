@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { User, HttpError, Empty } from './user.model';
-import { Observable, ReplaySubject, BehaviorSubject } from 'rxjs';
+import { Observable, ReplaySubject, BehaviorSubject, Subject } from 'rxjs';
 
 @Injectable()
 export class UserStateService {
@@ -12,13 +12,13 @@ export class UserStateService {
     startLoading$: Observable<boolean>;
 
     private usersSubject: BehaviorSubject<Array<User>>;
-    private newUserSubject: ReplaySubject<User>;
+    private newUserSubject: Subject<User>;
     private errorSubject: ReplaySubject<HttpError | Empty>;
     private isLoadingSubject: ReplaySubject<boolean>;
 
     constructor() {
         this.usersSubject = new BehaviorSubject<Array<User>>([]);
-        this.newUserSubject = new ReplaySubject<User>(1);
+        this.newUserSubject = new Subject<User>();
         this.errorSubject = new ReplaySubject<HttpError | Empty>(1);
         this.isLoadingSubject = new ReplaySubject<boolean>();
 
@@ -62,6 +62,7 @@ export class UserStateService {
     }
 
     pushUser(user: User) {
+        this.newUserSubject.next(user);
         this.users = [user, ...this.usersSubject.getValue()];
     }
 }

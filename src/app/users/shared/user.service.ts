@@ -30,7 +30,7 @@ export class UserService {
     fetchRandomUsers(): void {
         this.http.get('http://randomuser.me/api?results=4')
             .map((res: Response) => res.json())
-            .map((res: UsersResponse) => res.results)
+            .map((res: {results: Array<User>}) => res.results)
             .catch((error: Response) => Observable.throw(
                 new FetchUsersError('Users fetch failed: ' + error.text()))
             )
